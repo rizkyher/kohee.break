@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="640" height="640" viewBox="0 0 640 640">
+	<!-- Original Daruma line art for the Kohee Break background pattern. Used as a CSS mask, so colour comes from CSS. -->
+	<defs>
+		<g id="d" fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+			<path stroke-width="4" d="M120 14C182 14 224 58 224 124C224 184 184 226 120 226C56 226 16 184 16 124C16 58 58 14 120 14Z"/>
+			<path d="M30 92C40 52 76 28 120 28C164 28 200 52 210 92"/>
+			<path stroke-width="3.5" d="M58 68C72 46 168 46 182 68C196 90 194 134 170 150C148 164 92 164 70 150C46 134 44 90 58 68Z"/>
+			<path fill="#111" stroke="none" d="M112 86C104 70 86 63 70 69C61 72 57 82 63 89C64 82 70 78 78 78C90 78 101 81 112 86ZM128 86C136 70 154 63 170 69C179 72 183 82 177 89C176 82 170 78 162 78C150 78 139 81 128 86Z"/>
+			<circle cx="92" cy="106" r="17"/>
+			<circle stroke-width="2" cx="92" cy="106" r="10"/>
+			<circle cx="148" cy="106" r="17"/>
+			<circle stroke-width="2" cx="148" cy="106" r="10"/>
+			<path fill="#111" stroke="none" d="M98 107A5 5 0 1 1 88 107A5 5 0 1 1 98 107ZM152 107A5 5 0 1 1 142 107A5 5 0 1 1 152 107Z"/>
+			<path d="M115 120Q120 126 125 120"/>
+			<path stroke-width="4" d="M120 128C110 124 98 126 90 132C80 140 78 150 86 153C92 155 97 149 93 145M120 128C130 124 142 126 150 132C160 140 162 150 154 153C148 155 143 149 147 145"/>
+			<path d="M112 139L109 147M120 140L120 149M128 139L131 147"/>
+			<path d="M60 110C52 120 55 136 68 142M180 110C188 120 185 136 172 142"/>
+			<path d="M28 150C70 180 170 180 212 150"/>
+			<path d="M38 166C38 184 46 200 58 210M56 174C56 190 62 202 72 212M76 180C76 194 80 206 88 216M202 166C202 184 194 200 182 210M184 174C184 190 178 202 168 212M164 180C164 194 160 206 152 216"/>
+			<text x="120" y="215" text-anchor="middle" font-size="40" font-weight="700" font-family="'Hiragino Mincho ProN','Yu Mincho','Noto Serif CJK JP','Songti SC',serif" stroke-width="1.8">福</text>
+		</g>
+	</defs>
+	<use xlink:href="#d" href="#d" transform="translate(36 40) rotate(-10 120 120)"/>
+	<use xlink:href="#d" href="#d" transform="translate(372 332) rotate(12 94 94) scale(.78)"/>
+	<g font-family="'Hiragino Mincho ProN','Yu Mincho','Noto Serif CJK JP','Songti SC',serif" fill="none" stroke="#111" stroke-width="2.5">
+		<text font-size="128" transform="translate(408 196) rotate(6)">福</text>
+		<text font-size="84" transform="translate(92 566) rotate(-8)">福</text>
+	</g>
+</svg>

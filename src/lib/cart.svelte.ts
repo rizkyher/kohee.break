@@ -1,0 +1,77 @@
+import {
+	addLine,
+	cartCount,
+	cartTotal,
+	parseStoredCart,
+	priceLines,
+	setQty,
+	type CartLine
+} from '#lib/order.ts';
+import { productById, products } from '#lib/products.ts';
+
+const STORAGE_KEY = 'kohee-break:cart:v1';
+const knownIds = new Set(products.map((p) => p.id));
+
+class Cart {
+	lines = $state<CartLine[]>([]);
+	/** Bumped on every add so the badge and mascot can replay their reaction. */
+	bumps = $state(0);
+	lastAdded = $state<string | undefined>();
+	/** False when the browser blocks storage (private mode, in-app browsers). */
+	persistent = $state(true);
+
+	priced = $derived(priceLines(this.lines, products));
+	count = $derived(cartCount(this.lines));
+	total = $derived(cartTotal(this.priced));
+
+	/** Called once on mount; never during SSR, so the prerendered HTML stays an empty cart. */
+	load() {
+		try {
+			this.lines = parseStoredCart(localStorage.getItem(STORAGE_KEY), knownIds);
+		} catch {
+			this.persistent = false;
+		}
+	}
+
+	add(id: string, qty = 1) {
+		const product = productById(id);
+		if (!product?.available) return;
+		this.#save(addLine(this.lines, id, qty));
+		this.bumps += 1;
+		this.lastAdded = product.name;
+	}
+
+	set(id: string, qty: number) {
+		this.#save(setQty(this.lines, id, qty));
+	}
+
+	remove(id: string) {
+		this.#save(setQty(this.lines, id, 0));
+	}
+
+	clear() {
+		this.#save([]);
+	}
+
+	qtyOf(id: string) {
+		return this.lines.find((line) => line.id === id)?.qty ?? 0;
+	}
+
+	#save(lines: CartLine[]) {
+		this.lines = lines;
+		try {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+			this.persistent = true;
+		} catch {
+			this.persistent = false;
+		}
+	}
+}
+
+export const cart = new Cart();
+
+/** Which overlay is open. One at a time keeps focus handling simple. */
+export const ui = $state<{ productId: string | null; cartOpen: boolean }>({
+	productId: null,
+	cartOpen: false
+});

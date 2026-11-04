@@ -1,0 +1,390 @@
+@import 'tailwindcss';
+
+/* Brand tokens from the Kohee Break packaging. Default palette cleared so nothing off-brand sneaks in. */
+@theme {
+	--color-*: initial;
+	--color-red: #880b11;
+	--color-mascot: #960c11;
+	--color-cream: #f1eada;
+	--color-ivory: #fdfff1;
+	--color-ink: #111111;
+	--color-muted: #5c534b; /* 6.27:1 on cream */
+	--color-blush: #e9cfc2; /* 6.74:1 on red, secondary text on red blocks */
+	--color-transparent: transparent;
+
+	--font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+	--font-accent: 'Chakra Petch', 'Arial', sans-serif;
+	--font-sans: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+	--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	--breakpoint-xs: 25rem;
+}
+
+@layer base {
+	html {
+		background: var(--color-cream);
+		color: var(--color-ink);
+		scroll-padding-top: 5rem;
+		scrollbar-gutter: stable;
+		-webkit-text-size-adjust: 100%;
+		color-scheme: light;
+	}
+
+	html:has(dialog[open]) {
+		overflow: hidden;
+	}
+
+	body {
+		font-family: var(--font-sans);
+		overflow-x: clip;
+		min-height: 100dvh;
+		text-rendering: optimizeLegibility;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
+	:focus-visible {
+		outline: 3px solid var(--color-ink);
+		outline-offset: 3px;
+	}
+
+	.on-red :focus-visible,
+	.on-red:focus-visible {
+		outline-color: var(--color-ivory);
+	}
+
+	/* enhanced-img wraps <img> in <picture>; let the img size against the real parent */
+	picture {
+		display: contents;
+	}
+
+	::selection {
+		background: var(--color-red);
+		color: var(--color-ivory);
+	}
+}
+
+@layer components {
+	/* Display type: Anton, tight, poster-like */
+	.display {
+		font-family: var(--font-display);
+		font-weight: 400;
+		line-height: 0.86;
+		letter-spacing: -0.01em;
+		text-transform: uppercase;
+	}
+
+	/* Accent type: Chakra Petch stands in for the squared, Japanese-flavoured menu lettering */
+	.accent {
+		font-family: var(--font-accent);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	/* Buttons: square, bordered, background slides in on hover like a stamp being pressed */
+	.btn {
+		position: relative;
+		isolation: isolate;
+		overflow: hidden;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		min-height: 3.25rem;
+		padding: 0 1.5rem;
+		border: 2px solid var(--btn-border, currentColor);
+		background: var(--btn-bg, transparent);
+		color: var(--btn-fg, var(--color-ink));
+		font-family: var(--font-accent);
+		font-weight: 700;
+		font-size: 0.95rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition:
+			color 0.35s var(--ease-out-expo),
+			border-color 0.35s var(--ease-out-expo),
+			translate 0.15s ease;
+	}
+
+	.btn::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: var(--btn-fill, var(--color-ink));
+		transform: scaleX(0);
+		transform-origin: right center;
+		transition: transform 0.5s var(--ease-out-expo);
+	}
+
+	.btn:where(:hover, :focus-visible):not(:disabled)::before {
+		transform: scaleX(1);
+		transform-origin: left center;
+	}
+
+	.btn:where(:hover, :focus-visible):not(:disabled) {
+		color: var(--btn-fg-hover, var(--color-ivory));
+		border-color: var(--btn-border-hover, var(--btn-fill, var(--color-ink)));
+	}
+
+	.btn:active:not(:disabled) {
+		translate: 0 2px;
+	}
+
+	.btn:disabled {
+		cursor: not-allowed;
+		opacity: 0.45;
+	}
+
+	.btn-red {
+		--btn-bg: var(--color-red);
+		--btn-fg: var(--color-ivory);
+		--btn-border: var(--color-red);
+	}
+
+	.btn-ivory {
+		--btn-bg: var(--color-ivory);
+		--btn-fg: var(--color-red);
+		--btn-border: var(--color-ivory);
+	}
+
+	.btn-ghost-light {
+		--btn-fg: var(--color-ivory);
+		--btn-fill: var(--color-ivory);
+		--btn-fg-hover: var(--color-red);
+	}
+
+	.btn-sm {
+		min-height: 2.75rem;
+		padding: 0 1rem;
+		font-size: 0.85rem;
+	}
+
+	/* Daruma watermark: one SVG tile used as a mask so it can take any colour */
+	.daruma {
+		position: absolute;
+		inset: -3rem 0;
+		pointer-events: none;
+		background-color: currentColor;
+		opacity: var(--daruma-opacity, 0.06);
+		-webkit-mask: url('/daruma.svg') repeat;
+		mask: url('/daruma.svg') repeat;
+		-webkit-mask-size: var(--daruma-size, 560px);
+		mask-size: var(--daruma-size, 560px);
+		-webkit-mask-position: var(--daruma-pos, 0 0);
+		mask-position: var(--daruma-pos, 0 0);
+	}
+
+	/* Scroll-revealed blocks. Hidden only by JS, and only when below the fold at mount. */
+	.reveal-pending {
+		opacity: 0;
+		translate: 0 2.5rem;
+	}
+
+	.reveal-pending.reveal-clip {
+		opacity: 1;
+		translate: none;
+		clip-path: inset(0 0 100% 0);
+	}
+
+	.reveal-in {
+		transition:
+			opacity 0.8s var(--ease-out-expo),
+			translate 0.9s var(--ease-out-expo),
+			clip-path 1.1s var(--ease-out-expo);
+		transition-delay: var(--delay, 0ms);
+	}
+
+	/* lets display type size against its column (cqi) instead of the viewport */
+	.cq {
+		container-type: inline-size;
+	}
+
+	.sr-only-focusable:not(:focus) {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	/* Sheets: bottom sheet on phones, side drawer / centred panel from md up */
+	dialog.sheet {
+		--sheet-from: translateY(100%);
+		position: fixed;
+		inset: auto 0 0 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		max-width: none;
+		max-height: 92dvh;
+		border: 0;
+		border-radius: 1.25rem 1.25rem 0 0;
+		background: var(--color-cream);
+		color: var(--color-ink);
+		overflow: hidden;
+		transform: var(--sheet-from);
+		transition:
+			transform 0.5s var(--ease-out-expo),
+			opacity 0.4s ease,
+			overlay 0.5s allow-discrete,
+			display 0.5s allow-discrete;
+	}
+
+	dialog.sheet[open] {
+		transform: none;
+		display: flex;
+		flex-direction: column;
+	}
+
+	@starting-style {
+		dialog.sheet[open] {
+			transform: var(--sheet-from);
+		}
+	}
+
+	dialog.sheet::backdrop {
+		background: rgb(17 17 17 / 0.6);
+		opacity: 0;
+		transition:
+			opacity 0.4s ease,
+			overlay 0.4s allow-discrete,
+			display 0.4s allow-discrete;
+	}
+
+	dialog.sheet[open]::backdrop {
+		opacity: 1;
+	}
+
+	@starting-style {
+		dialog.sheet[open]::backdrop {
+			opacity: 0;
+		}
+	}
+
+	@media (min-width: 48rem) {
+		dialog.sheet.drawer {
+			--sheet-from: translateX(100%);
+			inset: 0 0 0 auto;
+			width: min(28rem, 100%);
+			height: 100dvh;
+			max-height: 100dvh;
+			border-radius: 0;
+		}
+
+		dialog.sheet.panel {
+			--sheet-from: translateY(2rem) scale(0.97);
+			inset: 0;
+			margin: auto;
+			width: min(60rem, calc(100% - 4rem));
+			height: fit-content;
+			max-height: calc(100dvh - 4rem);
+			border-radius: 0;
+		}
+
+		dialog.sheet.panel:not([open]) {
+			opacity: 0;
+		}
+
+		@starting-style {
+			dialog.sheet.panel[open] {
+				opacity: 0;
+			}
+		}
+	}
+}
+
+@keyframes rise {
+	from {
+		transform: translateY(105%);
+	}
+}
+
+@keyframes bottle-in {
+	from {
+		opacity: 0;
+		transform: translateY(4rem) rotate(var(--from-rotate, 8deg)) scale(0.9);
+	}
+}
+
+@keyframes hop {
+	0%,
+	100% {
+		transform: none;
+	}
+	25% {
+		transform: translateY(-14%) rotate(-7deg) scale(1.04, 0.96);
+	}
+	50% {
+		transform: translateY(0) scale(1.07, 0.93);
+	}
+	72% {
+		transform: translateY(-5%) rotate(4deg);
+	}
+}
+
+@keyframes pop {
+	0% {
+		transform: scale(0.3);
+	}
+	60% {
+		transform: scale(1.3);
+	}
+}
+
+@keyframes marquee {
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+@keyframes parallax {
+	to {
+		translate: 0 var(--parallax, -4rem);
+	}
+}
+
+@keyframes drift {
+	from {
+		translate: 0 1.5rem;
+	}
+	to {
+		translate: 0 -1.5rem;
+	}
+}
+
+/* Scroll-linked depth, only where the browser supports it natively; elsewhere layers sit still. */
+@supports (animation-timeline: scroll()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.parallax {
+			animation: parallax linear both;
+			animation-timeline: scroll(root);
+			animation-range: 0 100vh;
+		}
+
+		.daruma {
+			animation: drift linear both;
+			animation-timeline: view();
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
