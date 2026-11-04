@@ -47,7 +47,7 @@
 					/>
 				</div>
 				<div class="parallax cat" style="--parallax: -8rem">
-					<Mascot class="h-full w-auto text-mascot" />
+					<Mascot class="h-full w-auto" />
 				</div>
 			</div>
 		</div>
@@ -176,10 +176,12 @@
 		bottom: 0.5rem;
 	}
 
+	/* sits on cream on phones, so it keeps the mascot red */
 	.cat {
 		height: 5.5rem;
 		left: 4%;
 		top: 1rem;
+		color: var(--color-mascot);
 	}
 
 	.bottle {
@@ -314,11 +316,13 @@
 			bottom: 1rem;
 		}
 
+		/* inside the red hill here, so flip to ivory like the Our Story block */
 		.cat {
 			height: 8.5rem;
 			top: auto;
-			left: -14%;
-			bottom: 0;
+			left: 2%;
+			bottom: 1rem;
+			color: var(--color-ivory);
 		}
 
 		.copy {
