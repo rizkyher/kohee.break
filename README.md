@@ -53,12 +53,12 @@ Harga selalu dihitung dari `products.ts`; localStorage hanya menyimpan `id` dan 
 
 Salin `.env.example` ke `.env`. Semua nilai **publik** dan di-inline saat build (halaman di-prerender), jadi jangan isi rahasia.
 
-| Variabel              | Contoh                                    | Kalau kosong                                                                     |
-| --------------------- | ----------------------------------------- | -------------------------------------------------------------------------------- |
-| `WHATSAPP_NUMBER`     | `6281234567890`                           | Checkout WhatsApp dimatikan dengan pesan yang jelas. Format salah = build gagal. |
-| `INSTAGRAM_HANDLE`    | `kohee.break`                             | Link Instagram di footer disembunyikan.                                          |
-| `SITE_URL`            | `https://kohee-break.example.workers.dev` | `og:image` relatif, preview link di WhatsApp/IG bisa tidak muncul.               |
-| `FULFILLMENT_OPTIONS` | `Ambil sendiri,Antar (ongkir via chat)`   | Checkout tidak menanyakan cara pengambilan.                                      |
+| Variabel              | Contoh                                  | Kalau kosong                                                                     |
+| --------------------- | --------------------------------------- | -------------------------------------------------------------------------------- |
+| `WHATSAPP_NUMBER`     | `6281234567890`                         | Checkout WhatsApp dimatikan dengan pesan yang jelas. Format salah = build gagal. |
+| `INSTAGRAM_HANDLE`    | `koheebreak`                            | Link Instagram di footer disembunyikan.                                          |
+| `SITE_URL`            | `https://kohee-break.pages.dev`         | `og:image` relatif, preview link di WhatsApp/IG bisa tidak muncul.               |
+| `FULFILLMENT_OPTIONS` | `Ambil sendiri,Antar (ongkir via chat)` | Checkout tidak menanyakan cara pengambilan.                                      |
 
 Status stok: ubah `available` di `src/lib/products.ts`. Badge hanya muncul kalau field `badge` diisi (sekarang hanya Kuro Aren: "Signature", sesuai poster).
 

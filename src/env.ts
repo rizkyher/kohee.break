@@ -20,7 +20,7 @@ export const variables = defineEnvVars({
 	INSTAGRAM_HANDLE: {
 		public: true,
 		static: true,
-		description: 'Instagram username without @, e.g. kohee.break',
+		description: 'Instagram username without @, e.g. koheebreak',
 		schema: (value) => {
 			const handle = value?.trim().replace(/^@/, '');
 			if (!handle) return undefined;
