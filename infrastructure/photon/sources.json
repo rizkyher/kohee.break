@@ -1,0 +1,13 @@
+{
+	"preparedAt": "2026-11-06",
+	"photonVersion": "1.3.0",
+	"jarSource": "https://github.com/komoot/photon/releases/download/1.3.0/photon-1.3.0.jar",
+	"jarSha256": "a89707c0045e4807b2a1180e132e68e108d998709f48b6c94b98a6e281f571a5",
+	"dumpSource": "https://download1.graphhopper.com/public/asia/indonesia/photon-dump-indonesia-release-261018.jsonl.zst",
+	"dumpMd5": "1279b1252161008c2b3307d45d5daa0e",
+	"dataTimestamp": "2026-10-17T23:02:06Z",
+	"regionalJsonlSha256": "14e0850b6c8893ad959f0df8ace941e1c4b69d47e9f3f39e0463d4600860559f",
+	"bounds": [107.25, -7.3, 108.05, -6.55],
+	"places": 63398,
+	"license": "https://www.openstreetmap.org/copyright"
+}

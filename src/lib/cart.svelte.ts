@@ -7,12 +7,16 @@ import {
 	setQty,
 	type CartLine
 } from '#lib/order.ts';
-import { productById, products } from '#lib/products.ts';
+import type { Product } from '#lib/products.ts';
+import { track } from '#lib/tracking.ts';
 
 const STORAGE_KEY = 'kohee-break:cart:v1';
-const knownIds = new Set(products.map((p) => p.id));
 
 class Cart {
+	catalog = $state<Product[]>([]);
+	configure(products: Product[]) {
+		this.catalog = products;
+	}
 	lines = $state<CartLine[]>([]);
 	/** Bumped on every add so the badge and mascot can replay their reaction. */
 	bumps = $state(0);
@@ -20,23 +24,29 @@ class Cart {
 	/** False when the browser blocks storage (private mode, in-app browsers). */
 	persistent = $state(true);
 
-	priced = $derived(priceLines(this.lines, products));
+	priced = $derived(priceLines(this.lines, this.catalog));
 	count = $derived(cartCount(this.lines));
 	total = $derived(cartTotal(this.priced));
 
 	/** Called once on mount; never during SSR, so the prerendered HTML stays an empty cart. */
 	load() {
 		try {
-			this.lines = parseStoredCart(localStorage.getItem(STORAGE_KEY), knownIds);
+			this.lines = parseStoredCart(
+				localStorage.getItem(STORAGE_KEY),
+				new Set(this.catalog.map((p) => p.id))
+			);
 		} catch {
 			this.persistent = false;
 		}
 	}
 
 	add(id: string, qty = 1) {
-		const product = productById(id);
+		const product = this.catalog.find((p) => p.id === id);
 		if (!product?.available) return;
-		this.#save(addLine(this.lines, id, qty));
+		const next = addLine(this.lines, id, qty);
+		if (cartCount(next) === this.count) return;
+		this.#save(next);
+		track('add_to_cart', id);
 		this.bumps += 1;
 		this.lastAdded = product.name;
 	}

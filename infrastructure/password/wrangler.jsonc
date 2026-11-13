@@ -1,0 +1,17 @@
+{
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	"name": "kohee-password",
+	"account_id": "1ef2e18dc9de53cb201f3ca19b77bebb",
+	"main": "worker.ts",
+	"compatibility_date": "2026-11-06",
+	"secrets": { "required": ["PASSWORD_KDF_TOKEN"] },
+	"limits": { "cpu_ms": 5000 },
+	"ratelimits": [
+		{ "name": "KDF_LIMIT", "namespace_id": "1003", "simple": { "limit": 30, "period": 60 } }
+	],
+	"observability": {
+		"enabled": true,
+		"logs": { "invocation_logs": false },
+		"traces": { "enabled": true }
+	}
+}

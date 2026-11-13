@@ -28,7 +28,7 @@
 	>
 		<Shape name={look.shape} class={`media-shape shape-${look.shape} text-red`} />
 		<span class="number display" aria-hidden="true">{number}</span>
-		<enhanced:img
+		<img
 			src={product.image}
 			alt=""
 			class="bottle"

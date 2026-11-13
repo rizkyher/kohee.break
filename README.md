@@ -1,8 +1,10 @@
 # Kohee Break
 
-Storefront satu halaman untuk Kohee Break (kopi botol 250ml): katalog interaktif, keranjang yang tersimpan di browser, dan checkout lewat WhatsApp. Tanpa payment gateway, tanpa backend.
+Storefront satu halaman untuk Kohee Break (kopi botol 250ml), dilengkapi Kohee Studio: admin CMS, katalog dinamis, media R2, checkout WhatsApp tercatat, dan pengelolaan pesanan melalui database D1. Tanpa payment gateway.
 
-SvelteKit 3 + Svelte 5 + TypeScript, Tailwind CSS v4, Lucide, di-deploy ke Cloudflare Pages dengan halaman yang di-prerender.
+**Mulai dari [panduan Kohee Studio](docs/studio.md)** untuk migrasi, bootstrap admin `kohiibreak@gmail.com`, keamanan, pengujian, retensi data, dan deployment. Jalankan `npm run db:migrate` dan `npm run admin:bootstrap` sebelum development pertama.
+
+SvelteKit 3 + Svelte 5 + TypeScript, Tailwind CSS v4, Lucide, di-deploy ke Cloudflare Pages dengan SSR agar publish CMS berlaku tanpa redeploy.
 
 ## Arah desain
 
@@ -27,18 +29,18 @@ Motion: headline hero naik dari mask, botol masuk dengan rotasi, parallax ringan
 src/
 ├── env.ts                      # definisi & validasi env publik (WhatsApp, Instagram, URL, fulfillment)
 ├── routes/
-│   ├── +layout.ts              # prerender = true
+│   ├── +layout.ts              # prerender = false; SSR dari D1
 │   ├── +layout.svelte          # font + preload Anton
 │   ├── +page.svelte            # susunan section + SEO/Open Graph
 │   └── layout.css              # token warna, tipografi, tombol, sheet, keyframes
 └── lib/
-    ├── products.ts             # katalog (id, name, category, kind, description, price, size, image, available, badge?)
+    ├── products.ts             # kontrak produk storefront; katalog disimpan di D1
     ├── order.ts                # logika murni: qty, harga, validasi, format Rupiah, pesan & URL WhatsApp
     ├── order.test.ts           # unit test logika order
-    ├── cart.svelte.ts          # state keranjang reaktif + localStorage, state overlay
+    ├── cart.svelte.ts          # state keranjang reaktif + localStorage, katalog dari server, state overlay
     ├── brand.ts                # nama, tagline, link dari env
     ├── reveal.ts               # action reveal saat scroll (IntersectionObserver)
-    ├── assets/                 # foto botol (diolah otomatis ke AVIF/WebP oleh enhanced-img)
+    ├── assets/                 # foto botol sumber
     └── components/             # Header, Hero, Marquee, Signature, Menu, ProductCard, ProductDialog,
                                 # CartDialog, CartFeedback, Story, FinalCta, Footer, Mascot, Shape, QtyStepper
 static/                         # mascot.svg (sprite), daruma.svg, favicon, og.png
@@ -47,11 +49,11 @@ _headers                        # security headers (digabung adapter ke output P
 
 Alur pesan: Menu → Detail (dialog) → Add to Cart → Review keranjang → isi nama/catatan → **Pesan via WhatsApp**. Tombol itu membuka `https://wa.me/{nomor}?text={pesan}`. Keranjang **tidak** dikosongkan otomatis; pelanggan bisa mengosongkannya sendiri setelah chat beres. Halaman tidak pernah menyatakan pesanan "berhasil".
 
-Harga selalu dihitung dari `products.ts`; localStorage hanya menyimpan `id` dan `qty`, dan isinya divalidasi ulang saat dibaca.
+Harga dihitung dari katalog published D1 dan divalidasi ulang di server saat checkout. localStorage hanya menyimpan `id` dan `qty`, dan isinya divalidasi ulang saat dibaca. Checkout membuat catatan Pending Confirmation dan snapshot item sebelum menyiapkan URL WhatsApp.
 
 ## Konfigurasi
 
-Salin `.env.example` ke `.env`. Semua nilai **publik** dan di-inline saat build (halaman di-prerender), jadi jangan isi rahasia.
+Salin `.env.example` ke `.env`. Semua nilai **publik** dan di-inline saat build, jadi jangan isi rahasia. WhatsApp, Instagram, dan fulfillment menjadi nilai awal settings D1 pada penggunaan pertama; setelah itu edit melalui Studio. `SITE_URL` tetap konfigurasi build.
 
 | Variabel              | Contoh                                  | Kalau kosong                                                                     |
 | --------------------- | --------------------------------------- | -------------------------------------------------------------------------------- |
@@ -60,7 +62,7 @@ Salin `.env.example` ke `.env`. Semua nilai **publik** dan di-inline saat build 
 | `SITE_URL`            | `https://kohee-break.pages.dev`         | `og:image` relatif, preview link di WhatsApp/IG bisa tidak muncul.               |
 | `FULFILLMENT_OPTIONS` | `Ambil sendiri,Antar (ongkir via chat)` | Checkout tidak menanyakan cara pengambilan.                                      |
 
-Status stok: ubah `available` di `src/lib/products.ts`. Badge hanya muncul kalau field `badge` diisi (sekarang hanya Kuro Aren: "Signature", sesuai poster).
+Status stok, harga, produk featured, dan publication sekarang diubah melalui `/admin/products`. Kuro Aren tetap featured pada seed awal, sesuai poster.
 
 ## Menjalankan
 
@@ -71,6 +73,8 @@ npm ci
 ```
 
 ```bash
+npm run db:migrate
+npm run admin:bootstrap
 npm run dev
 ```
 
@@ -85,6 +89,8 @@ npm run preview
 `preview` menjalankan hasil build dengan `wrangler pages dev` pada port 4173, sama seperti di Cloudflare Pages.
 
 ## Deploy ke Cloudflare Pages
+
+Siapkan binding D1/R2 dan jalankan migrasi remote/bootstrap sesuai [docs/studio.md](docs/studio.md) terlebih dahulu.
 
 Target deploy: akun Cloudflare **Rizky Herdiansyah**, project Pages `kohee-break` (nama dari `wrangler.jsonc`). Semua variabel di bawah dimasukkan ke HTML saat build, jadi set sebagai variabel **build**, bukan runtime.
 
@@ -133,3 +139,7 @@ Perintah `project create` cukup sekali. Setelah dapat domain `*.pages.dev`, isi 
 
 - Format pesan WhatsApp memakai tanda "—" persis seperti contoh di brief.
 - Belum dibuat: sinkronisasi keranjang antar-tab, menyimpan nama pelanggan, structured data (JSON-LD butuh alamat/jam buka yang belum ada).
+
+## Delivery & shipping
+
+Pengaturan origin, ongkir berbasis rute jalan, dan konfigurasi MapLibre/PMTiles/OSRM tersedia dalam [panduan Smart Delivery](docs/delivery.md). Pengiriman nonaktif sampai admin menetapkan origin dan mengonfigurasi provider.

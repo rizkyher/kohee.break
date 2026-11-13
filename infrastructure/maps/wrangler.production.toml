@@ -1,0 +1,22 @@
+name = "kohee-map-tiles"
+account_id = "eb85a8ce283c91ec262bde26e1716165"
+main = "vendor/PMTiles/serverless/cloudflare/src/index.ts"
+compatibility_date = "2026-11-06"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "kohee-maps"
+
+[vars]
+ALLOWED_ORIGINS = "https://kohee-break.pages.dev"
+PUBLIC_HOSTNAME = "kohee-map-tiles.rizkyherdiansyah31.workers.dev"
+CACHE_CONTROL = "public, max-age=86400"
+
+[observability]
+enabled = true
+
+[observability.logs]
+invocation_logs = false
+
+[observability.traces]
+enabled = true

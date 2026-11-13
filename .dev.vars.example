@@ -1,0 +1,13 @@
+# Private runtime configuration. Copy to ignored .dev.vars.
+# Your official PMTiles Worker, tileset backed by your R2 bucket:
+MAP_TILEJSON_URL=
+# HTTPS routing Worker (Cloudflare Containers) or private OSRM nginx gateway:
+OSRM_URL=
+OSRM_TOKEN=
+# Private self-hosted Photon or authenticated Photon Worker:
+PHOTON_URL=
+PHOTON_TOKEN=
+
+# Required on native PBKDF2-limited runtimes; keep token server-side:
+PASSWORD_KDF_URL=https://kohee-password.khwarizmi.workers.dev
+PASSWORD_KDF_TOKEN=

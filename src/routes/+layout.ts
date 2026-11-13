@@ -1,2 +1,2 @@
-// Single static page: prerender it so Cloudflare serves plain HTML from the edge.
-export const prerender = true;
+// CMS publication is read from D1 on each request, without redeployment or stale HTML caches.
+export const prerender = false;

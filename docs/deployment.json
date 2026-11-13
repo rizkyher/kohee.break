@@ -1,0 +1,44 @@
+{
+	"verifiedAt": "2026-11-06T05:44:24.155Z",
+	"url": "https://kohee-break.pages.dev",
+	"quoteMeters": 4978.7,
+	"quoteFee": 9000,
+	"checks": [
+		"SSR catalog",
+		"No-store HTML and server secret non-disclosure",
+		"GPS self permission",
+		"Real PMTiles metadata and MVT tile",
+		"Admin login and unauthenticated redirect",
+		"Query validation and cross-origin protection",
+		"Real Photon search",
+		"Actual OSRM distance and fee",
+		"Login invalid-credential POST returns 400 without 500/1102",
+		"Private password Worker matches independent PBKDF2 vector",
+		"UPI quote beyond previous 10km cap",
+		"Mobile WebKit fresh high-accuracy geolocation options and accuracy status"
+	],
+	"noOrdersCreated": true,
+	"accountName": "Rizky Herdiansyah",
+	"accountId": "eb85a8ce283c91ec262bde26e1716165",
+	"pagesDeploymentId": "cb576a8a-9209-40a3-897a-2b5376648405",
+	"previousPagesDeploymentId": "5765b06b-7b07-48ea-ac7c-77b63adddddf",
+	"databaseId": "f5040716-dc64-466e-a246-f6a2919ae12f",
+	"mediaBucket": "kohee-studio-media",
+	"mapsBucket": "kohee-maps",
+	"mapWorker": "https://kohee-map-tiles.rizkyherdiansyah31.workers.dev",
+	"routingAccount": "Khwarizmi",
+	"originNote": "User-provided test origin -6.949305555555556, 107.60563888888888 remains enabled, labeled as a test location.",
+	"deploymentUrl": "https://cb576a8a.kohee-break.pages.dev",
+	"delivery": {
+		"settingsVersion": 2,
+		"maxDistanceKm": null,
+		"upiDistanceMeters": 10720.7,
+		"upiFee": 27000
+	},
+	"passwordWorker": {
+		"url": "https://kohee-password.khwarizmi.workers.dev",
+		"account": "Khwarizmi",
+		"versionId": "9d3cc5f8-4577-47f0-89b5-8573e01a0f48",
+		"iterations": 600000
+	}
+}

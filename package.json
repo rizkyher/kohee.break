@@ -14,9 +14,29 @@
 		"format": "prettier --write .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
-		"deploy": "npm run build && wrangler pages deploy"
+		"deploy": "npm run build && CLOUDFLARE_ACCOUNT_ID=eb85a8ce283c91ec262bde26e1716165 wrangler pages deploy .svelte-kit/cloudflare --project-name kohee-break --branch main --profile rizky",
+		"db:migrate": "wrangler d1 migrations apply DB --local",
+		"db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+		"admin:bootstrap": "node scripts/bootstrap-admin.mjs",
+		"data:retention": "node scripts/retention.mjs",
+		"test:integration": "node --experimental-strip-types scripts/smoke-studio.mjs",
+		"cf:types": "wrangler types src/cloudflare-env.d.ts --include-runtime false --env-interface CloudflareBindings --env-file .env.example && prettier --write src/cloudflare-env.d.ts",
+		"routing:types": "wrangler types infrastructure/osrm/worker-env.d.ts --config infrastructure/osrm/wrangler.jsonc --env-interface RoutingEnv --include-runtime false && prettier --write infrastructure/osrm/worker-env.d.ts",
+		"routing:check": "tsc -p infrastructure/osrm/tsconfig.json",
+		"routing:dev": "wrangler dev --config infrastructure/osrm/wrangler.jsonc --port 5002 --inspector-port 9235",
+		"routing:build": "wrangler deploy --config infrastructure/osrm/wrangler.jsonc --dry-run",
+		"routing:deploy": "wrangler deploy --config infrastructure/osrm/wrangler.jsonc",
+		"routing:test": "node scripts/check-routing-cloudflare.mjs",
+		"search:prepare": "sh infrastructure/photon/prepare.sh",
+		"search:types": "wrangler types infrastructure/photon/worker-env.d.ts --config infrastructure/photon/wrangler.jsonc --env-interface SearchEnv --include-runtime false && prettier --write infrastructure/photon/worker-env.d.ts",
+		"search:check": "tsc -p infrastructure/photon/tsconfig.json",
+		"search:dev": "wrangler dev --config infrastructure/photon/wrangler.jsonc --port 2323 --inspector-port 9236",
+		"search:build": "wrangler deploy --config infrastructure/photon/wrangler.jsonc --dry-run",
+		"search:deploy": "wrangler deploy --config infrastructure/photon/wrangler.jsonc"
 	},
 	"devDependencies": {
+		"@cloudflare/containers": "^0.3.7",
+		"@cloudflare/workers-types": "^5.20261104.1",
 		"@eslint/js": "^10.0.1",
 		"@sveltejs/adapter-cloudflare": "^8.0.0",
 		"@sveltejs/enhanced-img": "^1.0.0",
@@ -48,6 +68,9 @@
 		"@fontsource-variable/space-grotesk": "^5.3.0",
 		"@fontsource/anton": "^5.3.0",
 		"@fontsource/chakra-petch": "^5.3.0",
-		"@lucide/svelte": "^1.68.0"
+		"@lucide/svelte": "^1.68.0",
+		"@noble/hashes": "^2.4.0",
+		"maplibre-gl": "^6.16.0",
+		"zod": "^4.6.7"
 	}
 }

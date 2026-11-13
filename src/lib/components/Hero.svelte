@@ -3,9 +3,17 @@
 	import Shape from './Shape.svelte';
 	import { ui } from '#lib/cart.svelte.ts';
 	import { brand } from '#lib/brand.ts';
-	import { products, signature } from '#lib/products.ts';
+	import { useStorefront } from '#lib/storefront.ts';
+	const store = useStorefront();
+	const products = $derived(store().products);
+	const hero = $derived(store().content.hero);
+	const signature = $derived(
+		products.find((p) => p.id === hero.featuredProduct) ??
+			products.find((p) => p.badge) ??
+			products[0]
+	);
 
-	const chocori = products.find((p) => p.category === 'non-coffee') ?? signature;
+	const chocori = $derived(products.find((p) => p.category === 'non-coffee') ?? signature);
 </script>
 
 <section id="top" class="hero" aria-labelledby="hero-title">
@@ -20,8 +28,8 @@
 		</p>
 
 		<h1 id="hero-title" class="title display">
-			<span class="line line-1"><span>Break dulu.</span></span>
-			<span class="line line-2"><span>Kopinya lanjut.</span></span>
+			<span class="line line-1"><span>{hero.headline.split('\n')[0]}</span></span>
+			<span class="line line-2"><span>{hero.headline.split('\n').slice(1).join(' ')}</span></span>
 		</h1>
 
 		<div class="visual" aria-hidden="true">
@@ -29,16 +37,16 @@
 			<!-- stage caps the bottle group's width so tablets keep phone proportions -->
 			<div class="stage">
 				<div class="parallax back" style="--parallax: -2.5rem">
-					<enhanced:img
-						src={chocori.image}
+					<img
+						src={chocori?.image ?? '/products/bottle-chocori.png'}
 						alt=""
 						class="bottle"
 						sizes="(min-width: 1024px) 15vw, 34vw"
 					/>
 				</div>
 				<div class="parallax front" style="--parallax: -5rem">
-					<enhanced:img
-						src={signature.image}
+					<img
+						src={store().media[hero.imageId] ?? signature?.image ?? '/products/bottle-latte.png'}
 						alt=""
 						class="bottle"
 						sizes="(min-width: 1024px) 19vw, 46vw"
@@ -53,9 +61,10 @@
 		</div>
 
 		<div class="copy">
-			<p class="lead">Kadang, yang kamu butuhkan cuma jeda dan sebotol Kohee Break.</p>
+			<p class="lead">{hero.subheadline}</p>
 			<div class="ctas">
-				<a href="#menu" class="btn">Explore Our Menu</a>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- CMS destination validated by safeLink on the server -->
+				<a href={hero.ctaUrl || '#menu'} class="btn">{hero.ctaLabel}</a>
 				<button type="button" class="btn btn-red" onclick={() => (ui.cartOpen = true)}>
 					Order Your Break
 				</button>

@@ -4,7 +4,10 @@
 	import Shape from './Shape.svelte';
 	import { cart, ui } from '#lib/cart.svelte.ts';
 	import { formatRupiah } from '#lib/order.ts';
-	import { productById, type Product } from '#lib/products.ts';
+	import type { Product } from '#lib/products.ts';
+	import { useStorefront } from '#lib/storefront.ts';
+	import { track } from '#lib/tracking.ts';
+	const store = useStorefront();
 
 	let dialog: HTMLDialogElement;
 	let qty = $state(1);
@@ -12,11 +15,14 @@
 	let shown = $state<Product>();
 
 	$effect(() => {
-		const product = productById(ui.productId);
+		const product = store().products.find((p) => p.id === ui.productId);
 		if (product) {
 			shown = product;
 			qty = 1;
-			if (!dialog.open) dialog.showModal();
+			if (!dialog.open) {
+				dialog.showModal();
+				track('product_view', product.id);
+			}
 		} else if (dialog.open) {
 			dialog.close();
 		}
@@ -41,12 +47,7 @@
 			<div class="media on-red" aria-hidden="true">
 				<div class="daruma text-ivory" style="--daruma-opacity: 0.09; --daruma-size: 360px"></div>
 				<Shape name="hill" class="media-hill text-cream" />
-				<enhanced:img
-					src={shown.image}
-					alt=""
-					class="bottle"
-					sizes="(min-width: 768px) 24rem, 60vw"
-				/>
+				<img src={shown.image} alt="" class="bottle" sizes="(min-width: 768px) 24rem, 60vw" />
 			</div>
 
 			<div class="body">
@@ -67,6 +68,14 @@
 				<p class="kind">{shown.kind}</p>
 				<p class="desc">{shown.description}</p>
 
+				{#if shown.images.length > 1}<div class="product-gallery">
+						{#each shown.images as img (img.url)}<img
+								src={img.url}
+								alt={img.alt || shown.name}
+								loading="lazy"
+								style="height:100px;width:80px;object-fit:contain"
+							/>{/each}
+					</div>{/if}
 				<dl class="facts">
 					<div>
 						<dt>Harga</dt>

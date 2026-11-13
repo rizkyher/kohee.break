@@ -1,0 +1,27 @@
+{
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	"name": "kohee-search",
+	"account_id": "1ef2e18dc9de53cb201f3ca19b77bebb",
+	"main": "worker.ts",
+	"compatibility_date": "2026-11-06",
+	"secrets": { "required": ["PHOTON_TOKEN"] },
+	"containers": [
+		{
+			"class_name": "BandungSearch",
+			"image": "./Dockerfile",
+			"image_build_context": ".",
+			"instance_type": "basic",
+			"max_instances": 1
+		}
+	],
+	"durable_objects": { "bindings": [{ "name": "SEARCH", "class_name": "BandungSearch" }] },
+	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["BandungSearch"] }],
+	"ratelimits": [
+		{ "name": "SEARCH_LIMIT", "namespace_id": "1002", "simple": { "limit": 120, "period": 60 } }
+	],
+	"observability": {
+		"enabled": true,
+		"logs": { "invocation_logs": false },
+		"traces": { "enabled": true }
+	}
+}

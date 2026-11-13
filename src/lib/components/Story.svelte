@@ -1,10 +1,13 @@
 <script lang="ts">
 	import Mascot from './Mascot.svelte';
 	import { brand } from '#lib/brand.ts';
-	import { products } from '#lib/products.ts';
+	import { useStorefront } from '#lib/storefront.ts';
+	const store = useStorefront();
+	const products = $derived(store().products);
+	const story = $derived(store().content.story);
 	import { reveal } from '#lib/reveal.ts';
 
-	const chocori = products.find((p) => p.category === 'non-coffee') ?? products[0];
+	const chocori = $derived(products.find((p) => p.category === 'non-coffee') ?? products[0]);
 </script>
 
 <section id="story" class="story" aria-labelledby="story-title">
@@ -15,8 +18,8 @@
 			<div class="daruma text-ivory" style="--daruma-opacity: 0.09; --daruma-size: 380px"></div>
 			<p class="block-label accent">Our Story</p>
 			<Mascot class="cat text-ivory" label="Maskot kucing Kohee Break memeluk segelas kopi" />
-			<enhanced:img
-				src={chocori.image}
+			<img
+				src={store().media[story.imageId] ?? chocori?.image ?? '/products/bottle-chocori.png'}
 				alt=""
 				class="bottle"
 				sizes="(min-width: 1024px) 12vw, 30vw"
@@ -27,15 +30,11 @@
 
 		<div class="text">
 			<h2 id="story-title" class="quote display" use:reveal={{ clip: true }}>
-				Not every day needs fixing.
-				<span class="text-red">Sometimes, you just need a coffee break.</span>
+				{story.heading.split('\n')[0]}
+				<span class="text-red">{story.heading.split('\n').slice(1).join(' ')}</span>
 			</h2>
 			<div class="body" use:reveal={{ delay: 150 }}>
-				<p>
-					Di sela tugas, meeting, dan jalanan yang padat, jeda kecil itu perlu. Kohee Break ada
-					untuk momen itu: satu botol 250ml yang bisa kamu buka di mana pun kamu berhenti sebentar.
-				</p>
-				<p>Jadi kalau hari ini terasa berat, berhenti dulu. Ambil sebotol. Lanjut lagi nanti.</p>
+				{#each story.description.split('\n\n') as paragraph, i (i)}<p>{paragraph}</p>{/each}
 			</div>
 			<p class="sign accent" use:reveal={{ delay: 250 }}>
 				<span class="rule" aria-hidden="true"></span>

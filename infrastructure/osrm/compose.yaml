@@ -1,0 +1,20 @@
+services:
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:v6.0.0
+    command: osrm-routed --algorithm mld /data/bandung.osrm --max-table-size 100
+    volumes:
+      - ./data:/data:ro
+    expose:
+      - '5000'
+    restart: unless-stopped
+  gateway:
+    image: nginx:1.28-alpine
+    depends_on:
+      - osrm
+    ports:
+      - '127.0.0.1:5001:8080'
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template:ro
+    environment:
+      OSRM_TOKEN: ${OSRM_TOKEN:?Set a long random OSRM_TOKEN in your private environment}
+    restart: unless-stopped

@@ -3,74 +3,94 @@
 	import Mascot from './Mascot.svelte';
 	import { cart, ui } from '#lib/cart.svelte.ts';
 	import { formatRupiah } from '#lib/order.ts';
-	import { signature as product } from '#lib/products.ts';
+	import { useStorefront } from '#lib/storefront.ts';
+	const store = useStorefront();
+	const section = $derived(store().content.signature);
+	const product = $derived(
+		store().products.find((p) => p.id === section.productId) ??
+			store().products.find((p) => p.badge) ??
+			store().products[0]
+	);
 	import { reveal } from '#lib/reveal.ts';
 </script>
 
-<!-- Poster "Our Signature Kuro Aren": the headline changes colour where it crosses the red panel -->
-<section id="signature" class="signature" aria-labelledby="signature-title">
-	<div class="panel on-red" aria-hidden="true">
-		<div class="daruma text-ivory" style="--daruma-opacity: 0.08; --daruma-size: 420px"></div>
-	</div>
-
-	<p class="eyebrow accent">
-		<span class="text-cream">Our</span>
-		<span class="text-red">Signature</span>
-	</p>
-
-	<h2 id="signature-title" class="title display" use:reveal={{ clip: true }}>
-		<span class="layer on-panel">Kuro<br />Aren</span>
-		<span class="layer off-panel" aria-hidden="true">Kuro<br />Aren</span>
-	</h2>
-
-	<div class="visual" use:reveal={{ delay: 120 }}>
-		<enhanced:img
-			src={product.image}
-			alt={`Botol Kohee Break ${product.size} berisi ${product.name}`}
-			class="bottle"
-			sizes="(min-width: 1024px) 22vw, 56vw"
-			loading="lazy"
-		/>
-		<Mascot class="peek text-mascot" />
-	</div>
-
-	<div class="info" use:reveal={{ delay: 200 }}>
-		<p class="percent display">100%</p>
-		<p class="moment accent">Your break moment</p>
-
-		<dl class="facts">
-			<div>
-				<dt>Rasa</dt>
-				<dd>{product.kind}. {product.description}</dd>
-			</div>
-			<div class="pair">
-				<div>
-					<dt>Ukuran</dt>
-					<dd class="accent">{product.size}</dd>
-				</div>
-				<div>
-					<dt>Harga</dt>
-					<dd class="price display">{formatRupiah(product.price)}</dd>
-				</div>
-			</div>
-		</dl>
-
-		<div class="actions">
-			<button
-				type="button"
-				class="btn btn-red"
-				disabled={!product.available}
-				onclick={() => cart.add(product.id)}
-			>
-				<Plus size={18} strokeWidth={2.5} aria-hidden="true" />
-				{product.available ? 'Add to My Break' : 'Sedang habis'}
-			</button>
-			<button type="button" class="details" onclick={() => (ui.productId = product.id)}>
-				Lihat detail {product.name}
-			</button>
+{#if product}
+	<!-- Poster "Our Signature Kuro Aren": the headline changes colour where it crosses the red panel -->
+	<section id="signature" class="signature" aria-labelledby="signature-title">
+		<div
+			class="panel on-red"
+			aria-hidden="true"
+			style:background-image={store().media[section.imageId]
+				? `url(${store().media[section.imageId]})`
+				: undefined}
+			style:background-size="cover"
+		>
+			<div class="daruma text-ivory" style="--daruma-opacity: 0.08; --daruma-size: 420px"></div>
 		</div>
-	</div>
-</section>
+
+		<p class="eyebrow accent">
+			<span class="text-cream">Our</span>
+			<span class="text-red">Signature</span>
+		</p>
+
+		<h2 id="signature-title" class="title display" use:reveal={{ clip: true }}>
+			<span class="layer on-panel"
+				>{product.name.split(' ')[0]}<br />{product.name.split(' ').slice(1).join(' ')}</span
+			>
+			<span class="layer off-panel" aria-hidden="true"
+				>{product.name.split(' ')[0]}<br />{product.name.split(' ').slice(1).join(' ')}</span
+			>
+		</h2>
+
+		<div class="visual" use:reveal={{ delay: 120 }}>
+			<img
+				src={product.image}
+				alt={`Botol Kohee Break ${product.size} berisi ${product.name}`}
+				class="bottle"
+				sizes="(min-width: 1024px) 22vw, 56vw"
+				loading="lazy"
+			/>
+			<Mascot class="peek text-mascot" />
+		</div>
+
+		<div class="info" use:reveal={{ delay: 200 }}>
+			<p class="percent display">100%</p>
+			<p class="moment accent">{section.heading}</p>
+
+			<dl class="facts">
+				<div>
+					<dt>Rasa</dt>
+					<dd>{product.kind}. {product.description}</dd>
+				</div>
+				<div class="pair">
+					<div>
+						<dt>Ukuran</dt>
+						<dd class="accent">{product.size}</dd>
+					</div>
+					<div>
+						<dt>Harga</dt>
+						<dd class="price display">{formatRupiah(product.price)}</dd>
+					</div>
+				</div>
+			</dl>
+
+			<div class="actions">
+				<button
+					type="button"
+					class="btn btn-red"
+					disabled={!product.available}
+					onclick={() => cart.add(product.id)}
+				>
+					<Plus size={18} strokeWidth={2.5} aria-hidden="true" />
+					{product.available ? 'Add to My Break' : 'Sedang habis'}
+				</button>
+				<button type="button" class="details" onclick={() => (ui.productId = product.id)}>
+					Lihat detail {product.name}
+				</button>
+			</div>
+		</div>
+	</section>
+{/if}
 
 <style>
 	.signature {

@@ -1,0 +1,17 @@
+{
+	"url": "https://kohee-search.khwarizmi.workers.dev",
+	"verifiedAt": "2026-11-06T01:29:10.644Z",
+	"firstSuccessfulSearchMs": 16525,
+	"warmSearchMs": 1019,
+	"checks": [
+		"Unauthenticated 403",
+		"Status endpoint forbidden 404",
+		"Invalid query 400",
+		"Real Jalan Braga results",
+		"Real Gedung Sate results"
+	],
+	"accountName": "Khwarizmi",
+	"accountId": "1ef2e18dc9de53cb201f3ca19b77bebb",
+	"applicationId": "a03bcee7-c019-43e6-ad5c-24f4dd53bb5c",
+	"workerVersionId": "66544a0d-1ff7-443e-9a16-47407d8ba3a9"
+}

@@ -1,0 +1,8 @@
+*
+!Dockerfile
+!data/
+!data/photon.jar
+!data/index/
+!data/index/photon_data/
+!data/index/photon_data/**
+**/*.lock

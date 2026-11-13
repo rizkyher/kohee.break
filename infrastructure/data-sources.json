@@ -1,0 +1,21 @@
+{
+	"preparedAt": "2026-11-05",
+	"area": "Bandung Raya with routing buffer",
+	"bounds": [107.25, -7.3, 108.05, -6.55],
+	"basemap": {
+		"source": "https://build.protomaps.com/20261105.pmtiles",
+		"version": "4.15.2",
+		"maxzoom": 15,
+		"regionalSha256": "fd86d04a7f52eab88f820f396863acede8f97d0f2ce9f0bbff3d5d6198fafe98",
+		"verification": "pmtiles verify passed"
+	},
+	"routing": {
+		"source": "https://download.geofabrik.de/asia/indonesia/java-latest.osm.pbf",
+		"downloadMd5": "bc7d6b07006b33eca07a063f782c7e0b",
+		"regionalSha256": "6c645d80a873f52aceb3c987cd162f6915cbd6010884f36e90a8b2541465c288",
+		"extractStrategy": "osmium complete_ways",
+		"profile": "OSRM v6.0.0 car / MLD"
+	},
+	"license": "https://www.openstreetmap.org/copyright",
+	"note": "Archives and generated graphs are ignored by Git. Regional bounds are not store coordinates. Record new checksums when refreshing data."
+}

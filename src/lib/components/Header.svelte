@@ -2,6 +2,9 @@
 	import { Menu as MenuIcon, ShoppingBag, X } from '@lucide/svelte';
 	import Mascot from './Mascot.svelte';
 	import { cart, ui } from '#lib/cart.svelte.ts';
+	import { useStorefront } from '#lib/storefront.ts';
+	const store = useStorefront();
+	const storeName = $derived(store().settings.storeName);
 
 	const links = [
 		{ href: '#top', label: 'Home' },
@@ -20,7 +23,7 @@
 		<a
 			href="#top"
 			class="logo group flex items-center gap-2.5"
-			aria-label="Kohee Break, kembali ke atas"
+			aria-label={`${storeName}, kembali ke atas`}
 		>
 			{#key cart.bumps}
 				<span class="mascot" class:hop={cart.bumps > 0}>
@@ -28,7 +31,7 @@
 				</span>
 			{/key}
 			<span class="flex flex-col gap-1 leading-none">
-				<span class="display text-[1.4rem] md:text-[1.65rem]">Kohee Break</span>
+				<span class="display text-[1.4rem] md:text-[1.65rem]">{storeName}</span>
 				<span class="text-[0.62rem] tracking-[0.32em] text-muted" lang="ja">コーヒーブレイク</span>
 			</span>
 		</a>

@@ -4,6 +4,14 @@
 	import { brand } from '#lib/brand.ts';
 	import { ui } from '#lib/cart.svelte.ts';
 
+	import { useStorefront } from '#lib/storefront.ts';
+	const store = useStorefront();
+	const footer = $derived(store().content.footer);
+	const settings = $derived(store().settings);
+	const whatsapp = $derived(
+		settings.whatsappNumber ? `https://wa.me/${settings.whatsappNumber}` : undefined
+	);
+	const instagram = $derived(footer.instagram || settings.instagram);
 	const year = new Date().getFullYear();
 </script>
 
@@ -13,8 +21,8 @@
 			<div class="brandmark">
 				<Mascot class="h-16 w-auto text-mascot" />
 				<div>
-					<p class="display text-3xl">Kohee Break</p>
-					<p class="accent mt-1 text-sm tracking-[0.14em] text-red">{brand.tagline}</p>
+					<p class="display text-3xl">{settings.storeName}</p>
+					<p class="accent mt-1 text-sm tracking-[0.14em] text-red">{footer.description}</p>
 				</div>
 			</div>
 
@@ -27,34 +35,44 @@
 				</ul>
 			</nav>
 
-			{#if brand.whatsappChatUrl || brand.instagram}
+			{#if whatsapp || instagram || footer.socialLinks.length}
 				<ul class="contact" aria-label="Kontak">
-					{#if brand.whatsappChatUrl}
+					{#if whatsapp}
 						<li>
 							<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external wa.me link -->
-							<a href={brand.whatsappChatUrl} target="_blank" rel="noopener noreferrer">
+							<a href={whatsapp} target="_blank" rel="noopener noreferrer">
 								<MessageCircle size={18} strokeWidth={2.25} aria-hidden="true" />
-								WhatsApp +{brand.whatsappNumber}
+								WhatsApp +{settings.whatsappNumber}
 							</a>
 						</li>
 					{/if}
-					{#if brand.instagram}
+					{#if instagram}
 						<li>
 							<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external Instagram link -->
-							<a href={brand.instagram.url} target="_blank" rel="noopener noreferrer">
+							<a href={instagram} target="_blank" rel="noopener noreferrer">
 								<AtSign size={18} strokeWidth={2.25} aria-hidden="true" />
-								Instagram @{brand.instagram.handle}
+								Instagram @{instagram.split('/').filter(Boolean).at(-1)}
 							</a>
 						</li>
 					{/if}
+					{#each footer.socialLinks as link, i (i)}<li>
+							<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- CMS social URL validated by safeLink on the server -->
+							<a href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>
+						</li>{/each}
 				</ul>
 			{/if}
 		</div>
+		{#if footer.contact || settings.contact}<p style="margin-top:2rem;white-space:pre-line">
+				{footer.contact || settings.contact}
+			</p>{/if}
 
-		<p class="wordmark display" aria-hidden="true">Kohee Break</p>
+		{#if settings.storeInfo}<p style="margin-top:1rem;white-space:pre-line">
+				{settings.storeInfo}
+			</p>{/if}
+		<p class="wordmark display" aria-hidden="true">{settings.storeName}</p>
 
 		<div class="bottom">
-			<p>© {year} Kohee Break</p>
+			<p>© {year} {settings.storeName}</p>
 			<p lang="ja">{brand.katakana}</p>
 		</div>
 	</div>

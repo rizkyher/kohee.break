@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, setContext } from 'svelte';
+	import type { PageProps } from './$types';
+	import { STOREFRONT } from '#lib/storefront.ts';
+	import { track } from '#lib/tracking.ts';
+	import Banners from '#lib/components/Banners.svelte';
+	let { data }: PageProps = $props();
+	setContext(STOREFRONT, () => data.store);
 	import CartDialog from '#lib/components/CartDialog.svelte';
 	import CartFeedback from '#lib/components/CartFeedback.svelte';
 	import FinalCta from '#lib/components/FinalCta.svelte';
@@ -14,12 +20,15 @@
 	import { brand } from '#lib/brand.ts';
 	import { cart } from '#lib/cart.svelte.ts';
 
-	const title = 'Kohee Break | Break Time, Kohee Time';
-	const description =
-		'Kopi botol 250ml dari Kohee Break: Kuro Aren, Amai Scotch, Kuro Latte, dan Chocori. Pilih favoritmu, lalu pesan langsung lewat WhatsApp.';
+	const title = $derived(data.store.settings.seoTitle);
+	const description = $derived(data.store.settings.seoDescription);
 	const ogImage = `${brand.siteUrl ?? ''}/og.png`;
-
-	onMount(() => cart.load());
+	$effect(() => cart.configure(data.store.products));
+	onMount(() => {
+		cart.configure(data.store.products);
+		cart.load();
+		track('page_view');
+	});
 </script>
 
 <svelte:head>
@@ -43,15 +52,24 @@
 
 <a href="#menu" class="skip sr-only-focusable btn btn-red">Langsung ke menu</a>
 <Header />
+{#if data.store.settings.announcement}<aside class="store-announcement" role="status">
+		{data.store.settings.announcement}
+	</aside>{/if}
+{#if !data.store.settings.open}<aside class="store-announcement">
+		Toko sedang tidak menerima pesanan. Kamu tetap bisa menjelajahi menu.
+	</aside>{/if}
 <main>
-	<Hero />
-	<Marquee />
-	<Signature />
-	<Menu />
-	<Story />
+	{#each data.store.order as section (section)}
+		{#if section === 'hero' && data.store.content.hero.visible}<Hero />
+		{:else if section === 'marquee' && data.store.content.marquee.visible}<Marquee />
+		{:else if section === 'signature' && data.store.content.signature.visible}<Signature />
+		{:else if section === 'story' && data.store.content.story.visible}<Story />
+		{:else if section === 'banners' && data.store.content.banners.visible}<Banners />{/if}
+		{#if section === 'signature'}<Menu />{/if}
+	{/each}
 	<FinalCta />
 </main>
-<Footer />
+{#if data.store.content.footer.visible}<Footer />{/if}
 
 <CartFeedback />
 <ProductDialog />

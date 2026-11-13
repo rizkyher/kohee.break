@@ -3,5 +3,25 @@
 	"name": "kohee-break",
 	"compatibility_date": "2026-11-04",
 	"compatibility_flags": ["nodejs_als"],
-	"pages_build_output_dir": ".svelte-kit/cloudflare"
+	"pages_build_output_dir": ".svelte-kit/cloudflare",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "kohee-studio",
+			"database_id": "f5040716-dc64-466e-a246-f6a2919ae12f",
+			"migrations_dir": "migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "MEDIA",
+			"bucket_name": "kohee-studio-media"
+		}
+	],
+	"vars": {
+		"MAP_TILEJSON_URL": "https://kohee-map-tiles.rizkyherdiansyah31.workers.dev/bandung-20261105.json",
+		"OSRM_URL": "https://kohee-routing.khwarizmi.workers.dev",
+		"PASSWORD_KDF_URL": "https://kohee-password.khwarizmi.workers.dev",
+		"PHOTON_URL": "https://kohee-search.khwarizmi.workers.dev"
+	}
 }

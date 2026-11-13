@@ -2,7 +2,9 @@
 	import { Pause, Play } from '@lucide/svelte';
 	import Mascot from './Mascot.svelte';
 
-	const words = ['Break Time', 'Kohee Time', 'Sweet', 'Smooth', 'Tasty'];
+	import { useStorefront } from '#lib/storefront.ts';
+	const store = useStorefront();
+	const words = $derived(store().content.marquee.items);
 	let paused = $state(false);
 </script>
 
@@ -11,7 +13,7 @@
 		<div class="track" class:paused>
 			{#each [0, 1] as copy (copy)}
 				<ul class="group" aria-hidden="true">
-					{#each words as word (word)}
+					{#each words as word, i (i)}
 						<li class="display">{word}</li>
 						<li class="icon"><Mascot class="h-full w-auto" /></li>
 					{/each}

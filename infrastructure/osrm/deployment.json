@@ -1,0 +1,20 @@
+{
+	"verifiedAt": "2026-11-06T00:43:39.848Z",
+	"url": "https://kohee-routing.khwarizmi.workers.dev",
+	"distanceMeters": 3291.3,
+	"firstSuccessfulRouteMs": 3625,
+	"warmRouteMs": 79,
+	"checks": [
+		"unauthenticated 403",
+		"unsupported path 400",
+		"invalid coordinates 400",
+		"actual road route with GeoJSON",
+		"NoSegment 400"
+	],
+	"accountName": "Khwarizmi",
+	"accountId": "1ef2e18dc9de53cb201f3ca19b77bebb",
+	"workerName": "kohee-routing",
+	"containerApplicationId": "a03ee1e5-e76a-474e-9052-1107ed5c11b6",
+	"workerVersionId": "bed78d33-17f9-4961-9072-2b08dcefa969",
+	"note": "Public landmark acceptance only. Timings are one observation, not an SLA. No customer address or store origin was saved."
+}

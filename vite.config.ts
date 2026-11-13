@@ -5,6 +5,7 @@ import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
+	worker: { format: 'es' },
 	plugins: [
 		enhancedImages(),
 		tailwindcss(),
@@ -23,10 +24,11 @@ export default defineConfig({
 					'default-src': ['self'],
 					'script-src': ['self'],
 					'style-src': ['self', 'unsafe-inline'],
-					'img-src': ['self', 'data:'],
+					'img-src': ['self', 'data:', 'blob:'],
 					'font-src': ['self'],
 					'connect-src': ['self'],
 					'object-src': ['none'],
+					'worker-src': ['self', 'blob:'],
 					'base-uri': ['self'],
 					'form-action': ['self']
 				}

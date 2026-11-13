@@ -388,3 +388,18 @@
 		transition-duration: 0.01ms !important;
 	}
 }
+
+.store-announcement {
+	background: var(--color-red);
+	color: var(--color-ivory);
+	padding: 0.8rem 1rem;
+	text-align: center;
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+.product-gallery {
+	display: flex;
+	gap: 0.75rem;
+	overflow-x: auto;
+	margin-top: 1rem;
+}

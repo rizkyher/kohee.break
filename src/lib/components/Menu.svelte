@@ -3,7 +3,11 @@
 	import { fade } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import ProductCard from './ProductCard.svelte';
-	import { categories, products, type Category } from '#lib/products.ts';
+	import type { Category } from '#lib/products.ts';
+	import { useStorefront } from '#lib/storefront.ts';
+	const store = useStorefront();
+	const products = $derived(store().products);
+	const categories = $derived(store().categories);
 	import { reveal } from '#lib/reveal.ts';
 
 	let filter = $state<Category | 'all'>('all');

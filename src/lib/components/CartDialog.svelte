@@ -1,11 +1,24 @@
 <script lang="ts">
 	import { MessageCircle, Plus, Trash, X } from '@lucide/svelte';
+	import DeliveryAddress from './DeliveryAddress.svelte';
+	import type { Destination, ShippingQuote } from '#lib/studio/shipping.ts';
+	let delivery = $state<{
+		required: boolean;
+		destination: Destination | null;
+		quote: ShippingQuote | null;
+	}>({ required: true, destination: null, quote: null });
 	import Mascot from './Mascot.svelte';
 	import QtyStepper from './QtyStepper.svelte';
-	import { brand } from '#lib/brand.ts';
 	import { cart, ui } from '#lib/cart.svelte.ts';
-	import { buildOrderMessage, formatRupiah, orderProblems, whatsappUrl } from '#lib/order.ts';
-	import { products } from '#lib/products.ts';
+	import { formatRupiah, orderProblems } from '#lib/order.ts';
+	import { useStorefront } from '#lib/storefront.ts';
+	const store = useStorefront();
+	const products = $derived(store().products);
+	const settings = $derived(store().settings);
+	let busy = $state(false),
+		checkoutError = $state(''),
+		checkoutKey = $state(crypto.randomUUID());
+	let previousPayload = '';
 
 	let dialog: HTMLDialogElement;
 	let nameInput = $state<HTMLInputElement>();
@@ -15,18 +28,12 @@
 	let triedSubmit = $state(false);
 	let sent = $state(false);
 
-	const fulfillmentOptions = brand.fulfillmentOptions;
+	const fulfillmentOptions = $derived(settings.fulfillmentOptions);
 	const problems = $derived(
-		orderProblems({ lines: cart.priced, name, whatsappNumber: brand.whatsappNumber })
+		orderProblems({ lines: cart.priced, name, whatsappNumber: settings.whatsappNumber })
 	);
 	const needsFulfillment = $derived(fulfillmentOptions.length > 0 && !fulfillment);
 	const nameError = $derived(triedSubmit && problems.includes('missing-name'));
-	const message = $derived(
-		buildOrderMessage({ lines: cart.priced, name, note, fulfillment: fulfillment || undefined })
-	);
-	const href = $derived(
-		brand.whatsappNumber ? whatsappUrl(brand.whatsappNumber, message) : undefined
-	);
 
 	$effect(() => {
 		if (ui.cartOpen && !dialog.open) dialog.showModal();
@@ -39,15 +46,45 @@
 		sent = false;
 	});
 
-	function checkout(event: MouseEvent) {
+	async function checkout(event: MouseEvent) {
+		event.preventDefault();
 		triedSubmit = true;
-		if (problems.length > 0 || needsFulfillment) {
-			event.preventDefault();
+		checkoutError = '';
+		if (problems.length || needsFulfillment || (delivery.required && !delivery.quote)) {
 			if (problems.includes('missing-name')) nameInput?.focus();
 			return;
 		}
-		// The link opens WhatsApp; the cart stays until the customer clears it.
-		sent = true;
+		if (!settings.open || busy) return;
+		const payload = {
+			name: name.trim(),
+			note: note.trim(),
+			fulfillment,
+			items: cart.lines,
+			delivery: delivery.destination ?? undefined,
+			quoteId: delivery.quote?.id
+		};
+		const serialized = JSON.stringify(payload);
+		if (previousPayload && serialized !== previousPayload) checkoutKey = crypto.randomUUID();
+		previousPayload = serialized;
+		busy = true;
+		try {
+			const response = await fetch('/api/checkout', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ ...payload, key: checkoutKey })
+			});
+			const result = (await response.json()) as { message?: string; url: string };
+			if (!response.ok) throw new Error(result.message ?? 'Checkout gagal dicatat.');
+			sent = true;
+			window.location.assign(result.url);
+		} catch (e) {
+			checkoutError =
+				e instanceof Error
+					? e.message
+					: 'Koneksi bermasalah. Coba lagi; checkout yang sama tidak dicatat dua kali.';
+		} finally {
+			busy = false;
+		}
 	}
 </script>
 
@@ -105,7 +142,7 @@
 			<ul class="lines">
 				{#each cart.priced as line (line.product.id)}
 					<li class:unavailable={!line.product.available}>
-						<enhanced:img src={line.product.image} alt="" class="thumb" sizes="4rem" />
+						<img src={line.product.image} alt="" class="thumb" sizes="4rem" />
 						<div class="min-w-0">
 							<p class="accent text-lg leading-tight">{line.product.name}</p>
 							<p class="text-sm text-muted">
@@ -178,6 +215,7 @@
 					</fieldset>
 				{/if}
 
+				<DeliveryAddress onchange={(v) => (delivery = v)} />
 				<label class="field">
 					<span class="label">Catatan <span class="font-normal text-muted">(opsional)</span></span>
 					<textarea
@@ -194,11 +232,12 @@
 	{#if cart.priced.length > 0}
 		<div class="foot">
 			<div class="total">
-				<span class="accent">Total</span>
-				<span class="display text-4xl">{formatRupiah(cart.total)}</span>
+				<span class="accent">Total {delivery.quote?.status === 'manual' ? 'sementara' : ''}</span>
+				<span class="display text-4xl">{formatRupiah(cart.total + (delivery.quote?.fee ?? 0))}</span
+				>
 			</div>
 
-			{#if !brand.whatsappNumber}
+			{#if !settings.whatsappNumber}
 				<p class="notice" role="alert">
 					Pemesanan via WhatsApp belum aktif karena nomor penjual belum diatur. Cek lagi nanti, ya.
 				</p>
@@ -210,16 +249,21 @@
 					<p class="error" role="alert">Ada menu yang sedang habis. Hapus dulu dari keranjang.</p>
 				{/if}
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- external wa.me link -->
-				<a
+				<button
+					type="button"
 					class="btn btn-red w-full"
-					{href}
-					target="_blank"
-					rel="noopener noreferrer"
+					disabled={busy || !settings.open || (delivery.required && !delivery.quote)}
 					onclick={checkout}
 				>
-					<MessageCircle size={18} strokeWidth={2.5} aria-hidden="true" /> Pesan via WhatsApp
-				</a>
+					<MessageCircle size={18} strokeWidth={2.5} aria-hidden="true" />
+					{busy
+						? 'Menyiapkan pesanan…'
+						: settings.open
+							? 'Pesan via WhatsApp'
+							: 'Toko sedang tutup'}
+				</button>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
+				{#if checkoutError}<p class="error" role="alert">{checkoutError}</p>{/if}
 				{#if sent}
 					<div class="sent" role="status">
 						<p>
@@ -232,8 +276,9 @@
 					</div>
 				{:else}
 					<p class="fine">
-						Tombol ini membuka WhatsApp dengan pesan yang sudah terisi. Kamu tetap bisa mengubahnya
-						sebelum dikirim.
+						Nama dan catatan pesanan dicatat maksimal 90 hari untuk penanganan pesanan. Ringkasan
+						item dan total disimpan untuk laporan. Tombol ini menyiapkan pesan WhatsApp; pesanan
+						tetap memerlukan konfirmasi melalui chat.
 					</p>
 				{/if}
 			{/if}
